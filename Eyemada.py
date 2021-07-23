@@ -1,6 +1,11 @@
 #!/bin/python3
 from tkinter import *
 import subprocess
+import socket
+import validators
+from tkinter.font import families
+
+from validators.utils import ValidationFailure
 root = Tk()
 root.geometry('800x600')
 root.resizable(width=False, height=False)
@@ -22,7 +27,7 @@ target.place(width = 150, height=25, x=100, y=25)
 targetLBL = Label(root, text="Target", relief=SOLID, fg='grey85', bg='gray35')
 targetLBL.place(width = 100, height=25, x=0, y=25)
 
-targetDefault = Label(root, text="IP or CIDR", font=("TkDefaultFont",10), anchor=W, relief=FLAT, fg='grey85', bg='gray20')
+targetDefault = Label(root, text="URL, IP, or CIDR", font=("TkDefaultFont",10), anchor=W, relief=FLAT, fg='grey85', bg='gray20')
 targetDefault.place(width = 250, height=15, x=0, y=50)
 
 ports = Text(root, relief=SOLID, fg='grey85', bg='gray35')
@@ -248,9 +253,14 @@ def startScan():
     global ScanCt
     global Scan0Str, Scan1Str, Scan2Str, Scan3Str, Scan4Str, Scan5Str, Scan6Str, Scan7Str, Scan8Str
     global taken0, taken1, taken2, taken3, taken4, taken5, taken6, taken7, taken8
+    #get text from text entry
     defports = ports.get("1.0",'end-1c')
     deftarget = target.get("1.0",'end-1c')
     defname = scanName.get("1.0",'end-1c')
+    #default for target
+    if defports == "":
+        defports = "1-1000"
+    #confirm ScanCt with Taken
     if ScanCt == 0 and taken0 == True:
         ScanCt += 1
     if ScanCt == 1 and taken1 == True:
@@ -269,23 +279,45 @@ def startScan():
         ScanCt += 1
     if ScanCt == 8 and taken8 == True:
         ScanCt += 1
+    #check for URL
+    try:
+        socket.inet_aton(deftarget)
+        UrlCheck = False
+    except socket.error:
+        UrlCheck = TRUE
+    #if not url check if ip
+    if UrlCheck == False:
+        badtarget = False
+        checktarget = deftarget
+        checktarget = checktarget.replace("..", "X").replace(".", "").replace("/", "")
+        try:
+            int(checktarget)
+        except ValueError:
+            badtarget = True
+            Main.insert(END, "error: illegal target specifications\n")
+    #if url check if valid url
+    if UrlCheck == True:
+        if "https://" in deftarget:
+            deftarget = deftarget[8:]
+        if "http://" in deftarget:
+            deftarget = deftarget[7:]
+        try:
+            validators.url(deftarget)
+            badtarget = False
+            hostName = deftarget
+            deftarget = socket.gethostbyname(hostName)
+        except ValidationFailure:
+            badtarget = True
+            Main.delete('1.0', END)
+            Main.insert(END, "error: failed to resolve ip from URL\n")
     badports = False
     checkports = defports
     checkports = checkports.replace(",,", "X").replace(",", "").replace("-", "")
     try:
         int(checkports)
+        badports = False
     except ValueError:
         badports = True
-        Main.delete('1.0', END)
-        Main.insert(END, "error: illegal port specifications\n")
-    badtarget = False
-    checktarget = deftarget
-    checktarget = checktarget.replace("..", "X").replace(".", "").replace("/", "")
-    try:
-        int(checktarget)
-    except ValueError:
-        badtarget = True
-        Main.insert(END, "error: illegal target specifications\n")
     if badports == False and badtarget == False:
         TempStr = subprocess.check_output(["armada", deftarget, "-p", defports])
         Main.delete('1.0', END)
@@ -353,6 +385,12 @@ def startScan():
                 Scan8.config(text=defname)
             Scan8Str = TempStr
             taken8 = True
+        elif badports == True:
+            Main.delete('1.0', END)
+            Main.insert(END, "error: illegal port specifications\n")
+        elif badtarget == True:
+            Main.delete('1.0', END)
+            Main.insert(END, "error: illegal target specifications\n")
         ScanCt += 1
 
 ScanBtn = Button(root, text="scan", command=startScan)
@@ -366,7 +404,7 @@ Armada by d0nutptr <d0nut@resync.gg>
 
 USAGE
 Target - the target of the scan
-    -accepts IPv4 or CIDR
+    -accepts URL, IPv4, or CIDR
 Ports - sets which ports to scan 
     -accepts a single port, a port range, or multiple ports
 Scan Name - what the scan will be listed as
@@ -386,7 +424,5 @@ def ShowHelp():
         Help = False
 HelpBtn = Button(root, text="Toggle\nHelp Text", command=ShowHelp, relief=FLAT, font=("TkDefaultFont",7))
 HelpBtn.place(height=50, width=50, x=735, y=120)
-
-
 
 root.mainloop()
