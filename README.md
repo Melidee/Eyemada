@@ -10,7 +10,7 @@ Eyemada is a graphical interface for the Armada port scanner
     Install tkinter with `sudo apt-get install python-tk`  
     Download eyemada.py with `git clone https://github.com/Melidee/Eyemada.git`  
 
-**Usage Guide**
+**Usage Guide**  
     Target - the target of the scan  
         -accepts IPv4 or CIDR  
     Ports - sets which ports to scan   
@@ -18,3 +18,4 @@ Eyemada is a graphical interface for the Armada port scanner
     Scan Name - what the scan will be listed as  
         -defaults to target ip  
     Scan - starts the port scan  
+    Toggle Help Text - shows usage guide in GUI  
