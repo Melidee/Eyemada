@@ -251,9 +251,6 @@ def startScan():
     defports = ports.get("1.0",'end-1c')
     deftarget = target.get("1.0",'end-1c')
     defname = scanName.get("1.0",'end-1c')
-    badports = False
-    checkports = defports
-    checkports = checkports.replace(",,", "X").replace(",", "")
     if ScanCt == 0 and taken0 == True:
         ScanCt += 1
     if ScanCt == 1 and taken1 == True:
@@ -272,6 +269,9 @@ def startScan():
         ScanCt += 1
     if ScanCt == 8 and taken8 == True:
         ScanCt += 1
+    badports = False
+    checkports = defports
+    checkports = checkports.replace(",,", "X").replace(",", "").replace("-", "")
     try:
         int(checkports)
     except ValueError:
