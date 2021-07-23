@@ -11,11 +11,8 @@ Eyemada is a graphical interface for the Armada port scanner
     Download eyemada.py with `git clone https://github.com/Melidee/Eyemada.git`  
 
 **Usage Guide**  
-    Target - the target of the scan  
-        -accepts IPv4 or CIDR  
-    Ports - sets which ports to scan   
-        -accepts a single port, a port range, or multiple ports  
-    Scan Name - what the scan will be listed as  
-        -defaults to target ip  
+    Target - the target of the scan - accepts IPv4 or CIDR  
+    Ports - sets which ports to scan - accepts a single port, a port range, or multiple ports  
+    Scan Name - what the scan will be listed as - defaults to target ip  
     Scan - starts the port scan  
     Toggle Help Text - shows usage guide in GUI  
