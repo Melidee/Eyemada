@@ -8,6 +8,7 @@ Eyemada is a graphical interface for the Armada port scanner
 **Install Guide**  
     Install Armada via resync.gg's github <https://github.com/resyncgg/armada>  
     Install tkinter with `sudo apt-get install python-tk`  
+    Install sockets woth `pip install sockets`
     Install Validators with `pip install validators`  
     Download eyemada.py with `git clone https://github.com/Melidee/Eyemada.git`  
 
